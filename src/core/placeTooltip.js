@@ -88,6 +88,9 @@ function _determineAutoPosition(
   const tooltipHeight = getOffset(tooltipLayer).height + 10;
   const tooltipWidth = getOffset(tooltipLayer).width + 20;
   const targetElementRect = targetElement.getBoundingClientRect();
+  // tooltip can be located above or below without overhanging viewport
+  const withinViewport = windowSize.width - Math.abs(targetElementRect.left) > tooltipWidth &&
+    windowSize.width - Math.abs(targetElementRect.right) > tooltipWidth;
 
   // If we check all the possible areas, and there are no valid places for the tooltip, the element
   // must take up most of the screen real estate. Show the tooltip floating in the middle of the screen.
@@ -98,12 +101,12 @@ function _determineAutoPosition(
    */
 
   // Check for space below
-  if (targetElementRect.bottom + tooltipHeight > windowSize.height) {
+  if (!withinViewport || targetElementRect.bottom + tooltipHeight > windowSize.height) {
     removeEntry(possiblePositions, "bottom");
   }
 
   // Check for space above
-  if (targetElementRect.top - tooltipHeight < 0) {
+  if (!withinViewport || targetElementRect.top - tooltipHeight < 0) {
     removeEntry(possiblePositions, "top");
   }
 
